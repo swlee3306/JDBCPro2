@@ -29,7 +29,7 @@ public class memberService extends HttpServlet {
 		PrintWriter Writer = response.getWriter();
 
 		// Parameter로 넘어온 값들을 dto에 넣어준다.
-		dto.setId(request.getParameter("id").trim());
+		dto.setId(request.getParameter("id").trim());// 빈칸을 신경 쓰지 않기 위해 사용
 		dto.setPw(request.getParameter("pw").trim());
 		dto.setName(request.getParameter("name").trim());
 		dto.setTel(request.getParameter("tel").trim());

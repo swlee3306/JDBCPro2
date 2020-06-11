@@ -6,10 +6,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class memberDAO {
+	
 	private Connection conn;
 	private PreparedStatement pstmt;
 	private ResultSet rs;
-	private Statement st;
+	private Statement stmt;
+	
+	
+
 
 	public memberDAO() {
 		try {
@@ -25,13 +29,16 @@ public class memberDAO {
 	
 
 	public int update(memberDTO dto) {
-
-		String SQL = "SELECT * FROM memberInfo;";
-
+		
 		
 		try {
-			rs = st.executeQuery(SQL);
+			
+			String SQL = "SELECT * FROM memberInfo";
+			stmt = conn.createStatement();
+			System.out.println(SQL);
+			rs = stmt.executeQuery(SQL);
 
+			
 			while (rs.next()) {
 				if (rs.getString("id") == dto.getId() && rs.getString("name") == dto.getId()) {
 					if (rs.getString("pw") != dto.getPw()) {
