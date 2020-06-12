@@ -1,5 +1,10 @@
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,6 +21,12 @@ public class memberService extends HttpServlet {
 	private memberDTO dto = new memberDTO();
 
 	int result = 0;
+
+	int change = 0;
+
+	public Connection conn;
+	public ResultSet rs;
+	public Statement stmt;
 
 	public memberService() {
 		super();
@@ -38,121 +49,83 @@ public class memberService extends HttpServlet {
 		dto.setGender(request.getParameter("gender").trim());
 		dto.setBirth(request.getParameter("birth").trim());
 		dto.setIntroduce(request.getParameter("introduce").trim());
-		
-		
-		/* 
-		 * 
-		 * 주석 처리 된 부분이 업데이트를 검사하는 부분인데요
-		 * 이 부분이 코드에 문제가 있는지 계속 DAO 클래스에 있는 SQL 을 실행 시키지 못합니다.
-		 * 구현 하려 했던 로직은
-		 * 입력한 아이디 이름이 디비에 있는지 먼저 검사 하고 
-		 * 그 다음 입력된 패스워드랑 디비에 있는 패스워드랑 같은지 비교한 후
-		 * 업데이트를 시키는 로직으로 구현 하려 했습니다.
-		 * 반환 방식은 정수형 데이터를 반환해서 각 상황마다 If else 문을 이용하여 구현 하려 했습니다.
-		 * 
-		 */
-		
-		
-		
 
-//		result = dao.update(dto);
-//		
-//		if (result == -2) {
-//
-//			result = dao.register(dto);
-//
-//			if (result == -1) {
-//				System.out.println("저장 실패!");
-//				Writer.println("<script>");
-//				Writer.println("alert('Fail!')");
-//				Writer.println("</script>");
-//
-//			}
-//
-//			else {
-//				System.out.println("저장 성공!");
-//
-//				Writer.println("<script>");
-//				Writer.println("alert('Sucsess!');");
-//				Writer.println("</script>");
-//
-//				Writer.write("<!DOCTYPE html>");
-//				Writer.write("<html>");
-//				Writer.write("<head>");
-//				Writer.write("<title>가입한 정보</title>");
-//				Writer.write("</head>");
-//				Writer.write("<body>");
-//				Writer.write("아이디 : " + request.getParameter("id"));
-//				Writer.write("<br>");
-//				Writer.write("이름 : " + request.getParameter("name"));
-//				Writer.write("<br>");
-//				Writer.write("전화번호 : " + request.getParameter("tel"));
-//				Writer.write("<br>");
-//				Writer.write("이메일 : " + request.getParameter("email"));
-//				Writer.write("<br>");
-//				Writer.write("전공 : " + request.getParameter("dept"));
-//				Writer.write("<br>");
-//				Writer.write("성별 : " + request.getParameter("gender"));
-//				Writer.write("<br>");
-//				Writer.write("태어난 계절 : " + request.getParameter("birth"));
-//				Writer.write("<br>");
-//				Writer.write("자기소개 : " + request.getParameter("introduce"));
-//				Writer.write("</body>");
-//				Writer.write("</html>");
-//
-//			}
-//
-//		} else if (result == 2) {
-//
-//			System.out.println("패스워드 틀림!");
-//			Writer.println("<script>");
-//			Writer.println("alert('Password error!');");
-//			Writer.println("</script>");
-//
-//		} else {
-//			System.out.println("업데이트 성공!");
-//
-//			Writer.println("<script>");
-//			Writer.println("alert('Sucsess!');");
-//			Writer.println("</script>");
-//
-//			Writer.write("<!DOCTYPE html>");
-//			Writer.write("<html>");
-//			Writer.write("<head>");
-//			Writer.write("<title>가입한 정보</title>");
-//			Writer.write("</head>");
-//			Writer.write("<body>");
-//			Writer.write("아이디 : " + request.getParameter("id"));
-//			Writer.write("<br>");
-//			Writer.write("이름 : " + request.getParameter("name"));
-//			Writer.write("<br>");
-//			Writer.write("전화번호 : " + request.getParameter("tel"));
-//			Writer.write("<br>");
-//			Writer.write("이메일 : " + request.getParameter("email"));
-//			Writer.write("<br>");
-//			Writer.write("전공 : " + request.getParameter("dept"));
-//			Writer.write("<br>");
-//			Writer.write("성별 : " + request.getParameter("gender"));
-//			Writer.write("<br>");
-//			Writer.write("태어난 계절 : " + request.getParameter("birth"));
-//			Writer.write("<br>");
-//			Writer.write("자기소개 : " + request.getParameter("introduce"));
-//			Writer.write("</body>");
-//		}
-//
-//	}
 
-		result = dao.register(dto);
+		try {
+
+			String dbURL = "jdbc:mysql://localhost:3306/member?characterEncoding=UTF-8&serverTimezone=UTC&useSSL=false";
+			String dbID = "root";
+			String dbPassword = "Ykk159357";
+			Class.forName("org.mariadb.jdbc.Driver");
+
+			try {
+
+				conn = DriverManager.getConnection(dbURL, dbID, dbPassword);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		String SQL = "SELECT * FROM memberInfo;";
+
+		try {
+
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(SQL);
+
+			while (rs.next()) {
+				if (rs.getString("id").equals(dto.getId()) && rs.getString("name").equals(dto.getName())
+						&& rs.getString("pw").equals(dto.getPw())) {
+
+					Writer.println("<script>");
+					Writer.println("alert('update!')");
+					Writer.println("</script>");
+
+					change = 1;
+					break;
+
+				} else {
+
+					continue;
+
+				}
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		if (change == 0) {
+
+			result = dao.register(dto);
+
+		} else if (change == 1) {
+
+			result = dao.update(dto);
+		}
 
 		if (result == -1) {
+
 			System.out.println("저장 실패!");
 			Writer.println("<script>");
 			Writer.println("alert('Fail!')");
 			Writer.println("</script>");
 
-		}
+		} else if (result == -3) {
 
-		else {
+			System.out.println("업데이트 실패!");
+			Writer.println("<script>");
+			Writer.println("alert('Fail!')");
+			Writer.println("</script>");
+
+		} else {
+
 			System.out.println("저장 성공!");
 
 			Writer.println("<script>");
@@ -186,6 +159,7 @@ public class memberService extends HttpServlet {
 		}
 
 	}
+
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {

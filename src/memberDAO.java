@@ -6,14 +6,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class memberDAO {
-	
+
 	private Connection conn;
 	private PreparedStatement pstmt;
 	private ResultSet rs;
 	private Statement stmt;
-	
-	
-
 
 	public memberDAO() {
 		try {
@@ -26,50 +23,32 @@ public class memberDAO {
 			e.printStackTrace();
 		}
 	}
-	
 
 	public int update(memberDTO dto) {
-		
-		
+
 		try {
-			
-			String SQL = "SELECT * FROM memberInfo";
-			stmt = conn.createStatement();
-			System.out.println(SQL);
-			rs = stmt.executeQuery(SQL);
 
-			
-			while (rs.next()) {
-				if (rs.getString("id") == dto.getId() && rs.getString("name") == dto.getId()) {
-					if (rs.getString("pw") != dto.getPw()) {
-						return 2;
-					} else {
-						String SQL2 = "update memberInfo set tel=?, email=?, dept=?, gender=?, birth=?, introduce=? where id=?, pw=?, name=?";
+			String SQL2 = "update memberInfo set tel=?, email=?, dept=?, gender=?, birth=?, introduce=? where id=?";
 
-						pstmt = conn.prepareStatement(SQL2);
-						pstmt.setString(1, dto.getTel());
-						pstmt.setString(2, dto.getEmail());
-						pstmt.setString(3, dto.getDept());
-						pstmt.setString(4, dto.getGender());
-						pstmt.setString(5, dto.getBirth());
-						pstmt.setString(6, dto.getIntroduce());
-						pstmt.setString(7, dto.getId());
-						pstmt.setString(8, dto.getPw());
-						pstmt.setString(9, dto.getName());
+			pstmt = conn.prepareStatement(SQL2);
+			pstmt.setString(1, dto.getTel());
+			pstmt.setString(2, dto.getEmail());
+			pstmt.setString(3, dto.getDept());
+			pstmt.setString(4, dto.getGender());
+			pstmt.setString(5, dto.getBirth());
+			pstmt.setString(6, dto.getIntroduce());
+			pstmt.setString(7, dto.getId());
 
-						return pstmt.executeUpdate();
-					}
-				} else {
-					return -2;
-				}
-			}
-		} catch (SQLException e) {
+			return pstmt.executeUpdate();
+		}
+
+		catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 			return -3;
 
 		}
-		return 0;
 
 	}
 
